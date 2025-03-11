@@ -25,8 +25,8 @@ jobs:
     resource_class: small
     steps:
       - checkout
-      - run: cd remote-state && terraform init
-      - run: cd remote-state && terraform plan -out=tf-backend.plan
+      - run: terraform -chdir=remote-state init
+      - run: terraform -chdir=remote-state plan -out=tf-backend.plan
 
     terraform_apply_backend:
       docker:
@@ -34,9 +34,10 @@ jobs:
       resource_class: small
       steps:
         - checkout
-        - run: cd remote-state && terraform init
-        - run: cd remote-state && terraform plan -out=tf-backend.plan
-        - run: cd remote-state && terraform apply tf-backend.plan
+        - run: terraform -chdir=remote-state init
+        - run: terraform -chdir=remote-state plan -out=tf-backend.plan
+        - run: terraform -chdir=remote-state apply -out=tf-backend.plan
+
 
   tflint_region:
     docker:
@@ -199,13 +200,13 @@ workflows:
             parameters:
               region: ["us-east-1", "eu-central-1"]    
           context: 
-            - maverick-aws
+            - aws
             - splunk
       - terraform_plan_global:
           name: terraform-plan-global
           requires:
             - tflint-global
-          context: maverick-aws      
+          context: aws      
       - approval:
           name: global-approval
           type: approval
@@ -219,7 +220,7 @@ workflows:
           name: terraform-apply-global
           requires:
             - global-approval
-          context: maverick-aws
+          context: aws
           filters:
             branches:
               only:
@@ -241,7 +242,7 @@ workflows:
             parameters:
               region: ["us-east-1", "eu-central-1"]    
           context: 
-            - maverick-aws
+            - aws
             - splunk
           filters:
             branches:

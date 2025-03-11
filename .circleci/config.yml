@@ -195,8 +195,7 @@ workflows:
       - terraform_plan_region:
           name: terraform-plan-<<matrix.region>>
           requires:
-            - tflint-<<parameters.region>>
-            - terraform-apply-global
+            - tflint-<<matrix.region>>
           matrix:
             parameters:
               region: ["us-east-1", "eu-central-1"]    
@@ -230,7 +229,8 @@ workflows:
           name: region-approval
           type: approval
           requires: 
-            - terraform-plan-<<parameters.region>>
+            - terraform-plan-us-east-1
+            - terraform-plan-eu-central-1
           filters:
             branches:
               only:

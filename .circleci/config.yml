@@ -29,7 +29,7 @@ jobs:
               unzip tflint.zip
               rm -f tflint.zip
       - run: cd <<parameters.region>> && ../tflint --minimum-failure-severity=error
-  terraform_plan:
+  terraform_plan_region:
     docker:
       - image: hashicorp/terraform:1.7
     resource_class: small
@@ -46,13 +46,23 @@ workflows:
   tflint_and_plan:
     jobs:
       - tflint:
+          name: tflint-<<parameters.region>>
           matrix:
             parameters:
-              region: ["global", "us-east-1", "us-east-2"]    
-      - terraform_plan:
+              region: ["global","us-east-1", "us-east-2"]    
+      - terraform_plan_region:
+          name: terraform-plan-<<parameters.region>>
           requires:
-            - tflint
+            - tflint-<<parameters.region>>
           matrix:
             parameters:
-              region: ["global", "us-east-1", "us-east-2"]    
+              region: ["us-east-1", "us-east-2"]    
+          context: aws
+      - terraform_plan_region:
+          name: terraform-plan-<<parameters.region>>
+          requires:
+            - tflint-<<parameters.region>>
+          matrix:
+            parameters:
+              region: ["global"]    
           context: aws

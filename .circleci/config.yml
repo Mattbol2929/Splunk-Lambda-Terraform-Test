@@ -42,11 +42,13 @@ workflows:
   tflint_and_plan:
     jobs:
       - tflint:
-          parameters:
-            region: ["global", "us-east-1", "us-west-2"]    
+          matrix:
+            parameters:
+              region: ["global", "us-east-1", "us-west-2"]    
       - terraform_plan:
           requires:
             - tflint
-          parameters:
-            region: ["global", "us-east-1", "us-west-2"]
+          matrix:
+            parameters:
+              region: ["global", "us-east-1", "us-west-2"]    
           context: aws

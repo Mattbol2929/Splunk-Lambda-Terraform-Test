@@ -69,7 +69,29 @@ jobs:
     steps:
       - checkout
       - run: terraform -chdir=global init 
-      - run: terraform -chdir=global plan -var-file=terraform.tfvars
+      - run: terraform -chdir=global plan
+
+  terraform_apply_region:
+    docker:
+      - image: hashicorp/terraform:1.7
+    resource_class: small
+    parameters:
+      region:
+        description: "AWS region to deploy to"
+        type: string
+    steps:
+      - checkout
+      - run: terraform -chdir=<<parameters.region>> init 
+      - run: terraform -chdir=<<parameters.region>> apply -var-file=terraform.tfvars
+
+  terraform_apply_global:
+    docker:
+      - image: hashicorp/terraform:1.7
+    resource_class: small
+    steps:
+      - checkout
+      - run: terraform -chdir=global init 
+      - run: terraform -chdir=global apply
 
 workflows:
   tflint_and_plan:
@@ -97,3 +119,25 @@ workflows:
           requires:
             - tflint-global
           context: aws
+      
+      - approval:
+          name: global-approval
+          type: approval
+          requires: 
+            - terraform-plan-global
+
+      - terraform_apply_global:
+          name: terraform-apply-global
+          requires:
+            - terraform-plan-global
+            - global-approval
+          context: aws
+      
+      - approval:
+          name: region-approval
+          type: approval
+          requires: 
+            - terraform-plan-us-east-1
+            - terraform-plan-us-east-2
+
+      

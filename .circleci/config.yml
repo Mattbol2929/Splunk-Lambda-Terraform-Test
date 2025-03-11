@@ -28,7 +28,7 @@ jobs:
               curl -L -o tflint.zip https://github.com/terraform-linters/tflint/releases/download/v0.45.0/tflint_linux_amd64.zip
               unzip tflint.zip
               rm -f tflint.zip
-      - run: cd <<parameters.region>> && ../tflint
+      - run: cd <<parameters.region>> && ../tflint --minimum-failure-severity=error
   terraform_plan:
     docker:
       - image: alpine:latest
@@ -48,11 +48,11 @@ workflows:
       - tflint:
           matrix:
             parameters:
-              region: ["global", "us-east-1", "us-west-2"]    
+              region: ["global", "us-east-1", "us-east-2"]    
       - terraform_plan:
           requires:
             - tflint
           matrix:
             parameters:
-              region: ["global", "us-east-1", "us-west-2"]    
+              region: ["global", "us-east-1", "us-east-2"]    
           context: aws

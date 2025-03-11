@@ -62,7 +62,6 @@ workflows:
           name: terraform-plan-<<parameters.region>>
           requires:
             - tflint-<<parameters.region>>
-          matrix:
-            parameters:
-              region: ["global"]    
+          parameters:
+            region: "global"
           context: aws

@@ -68,7 +68,7 @@ jobs:
             export TF_VAR_hec_token="$SPLUNK_HEC_TOKEN"
             
             # Create a new terraform.tfvars file with the correct values
-            cat > <<parameters.region>>/terraform.tfvars << EOF
+            cat > <<parameters.region>>/terraform.tfvars \<< EOF
             # Path to the Lambda function zip file
             lambda_zip_path = "../src/SplunkLambdaCloudWatchLogsProcessor.zip"
 
@@ -112,7 +112,7 @@ jobs:
             export TF_VAR_hec_token="$SPLUNK_HEC_TOKEN"
             
             # Create a new terraform.tfvars file with the correct values
-            cat > <<parameters.region>>/terraform.tfvars << EOF
+            cat > <<parameters.region>>/terraform.tfvars \<< EOF
             # Path to the Lambda function zip file
             lambda_zip_path = "../src/SplunkLambdaCloudWatchLogsProcessor.zip"
 

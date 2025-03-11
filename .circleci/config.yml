@@ -36,8 +36,7 @@ jobs:
         - checkout
         - run: terraform -chdir=remote-state init
         - run: terraform -chdir=remote-state plan -out=tf-backend.plan
-        - run: terraform -chdir=remote-state apply -out=tf-backend.plan
-
+        - run: terraform -chdir=remote-state apply
 
   tflint_region:
     docker:

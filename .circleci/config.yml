@@ -109,6 +109,7 @@ workflows:
           name: terraform-plan-<<matrix.region>>
           requires:
             - tflint-<<matrix.region>>
+            - terraform-apply-global
           matrix:
             parameters:
               region: ["us-east-1", "us-east-2"]    

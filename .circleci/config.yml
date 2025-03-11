@@ -168,6 +168,8 @@ workflows:
           name: terraform-plan-backend
           requires: 
             - tflint-backend
+      - context:
+            - aws
       - approval:
           name: backend-approval
           type: approval

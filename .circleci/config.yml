@@ -60,7 +60,7 @@ jobs:
     steps:
       - checkout
       - run: terraform -chdir=<<parameters.region>> init 
-      - run: terraform -chdir=<<parameters.region>> plan -var-file=terraform.tfvars
+      - run: terraform -chdir=<<parameters.region>> plan -var-file=terraform.tfvars -out=tf-<<parameters.region>>.plan
 
   terraform_plan_global:
     docker:
@@ -69,7 +69,7 @@ jobs:
     steps:
       - checkout
       - run: terraform -chdir=global init 
-      - run: terraform -chdir=global plan
+      - run: terraform -chdir=global plan -out=tf-global.plan
 
   terraform_apply_region:
     docker:
@@ -82,7 +82,7 @@ jobs:
     steps:
       - checkout
       - run: terraform -chdir=<<parameters.region>> init 
-      - run: terraform -chdir=<<parameters.region>> apply -var-file=terraform.tfvars
+      - run: terraform -chdir=<<parameters.region>> apply tf-<<parameters.region>>.plan -var-file=terraform.tfvars
 
   terraform_apply_global:
     docker:
@@ -91,7 +91,7 @@ jobs:
     steps:
       - checkout
       - run: terraform -chdir=global init 
-      - run: terraform -chdir=global apply
+      - run: terraform -chdir=global apply tf-global.plan
 
 workflows:
   tflint_and_plan:

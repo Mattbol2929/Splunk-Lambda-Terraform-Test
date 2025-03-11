@@ -28,7 +28,7 @@ jobs:
       - run: terraform -chdir=remote-state init
       - run: terraform -chdir=remote-state plan -out=tf-backend.plan
 
-    terraform_apply_backend:
+  terraform_apply_backend:
       docker:
         - image: hashicorp/terraform:1.7
       resource_class: small

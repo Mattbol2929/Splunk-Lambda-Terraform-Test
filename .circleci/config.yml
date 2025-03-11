@@ -18,8 +18,8 @@ jobs:
     steps:
       - setup_remote_docker
       - checkout
-      - run: pwd && ls -la && ls -la ../ && ls -la ../.. && ls -la ../../..
-      - run:  docker run --rm -v $(pwd):/data -t --entrypoint /bin/sh ghcr.io/terraform-linters/tflint -c "tflint --init && pwd && ls -la && cd <<parameters.region>>/ && tflint"
+      #- run: pwd && ls -la && ls -la ../ && ls -la ../.. && ls -la ../../..
+      - run:  docker run --rm -v $(pwd):/data -t --entrypoint /bin/sh ghcr.io/terraform-linters/tflint -c "tflint --init && pwd && ls -la && cd /home/circleci/project/<<parameters.region>>/ && tflint"
       #- run: cd <<parameters.region>> && ../.tflint
   terraform_plan:
     docker:

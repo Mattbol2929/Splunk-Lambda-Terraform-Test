@@ -165,7 +165,7 @@ workflows:
     jobs:
       - tflint_backend:
           name: tflint-backend
-      - tflint_backend_plan:
+      - terraform_plan_backend:
           name: tflint-backend-plan
           requires: 
             - tflint-backend
@@ -176,7 +176,7 @@ workflows:
             branches:
               only:
                 - main            
-      - tflint_backend_apply:
+      - terraform_apply_backend:
           name: tflint-backend-plan
           requires:
             - backend-approval

@@ -82,6 +82,7 @@ jobs:
     steps:
       - checkout
       - run: terraform -chdir=<<parameters.region>> init 
+      - run: terraform -chdir=<<parameters.region>> plan -var-file=terraform.tfvars -out=tf-<<parameters.region>>.plan
       - run: terraform -chdir=<<parameters.region>> apply tf-<<parameters.region>>.plan -var-file=terraform.tfvars
 
   terraform_apply_global:
@@ -90,7 +91,8 @@ jobs:
     resource_class: small
     steps:
       - checkout
-      - run: terraform -chdir=global init 
+      - run: terraform -chdir=global init
+      - run: terraform -chdir=global plan -out=tf-global.plan
       - run: terraform -chdir=global apply tf-global.plan
 
 workflows:
@@ -130,7 +132,6 @@ workflows:
       - terraform_apply_global:
           name: terraform-apply-global
           requires:
-            - terraform-plan-global
             - global-approval
           context: aws
       

@@ -176,7 +176,9 @@ workflows:
           filters:
             branches:
               only:
-                - main            
+                - main
+          context:
+            - aws            
       - terraform_apply_backend:
           name: terrafor-apply-backend
           requires:
@@ -185,6 +187,8 @@ workflows:
               branches:
                 only:
                   - main
+          context:
+            - aws
       - tflint_region:
           name: tflint-<<matrix.region>>
           matrix:

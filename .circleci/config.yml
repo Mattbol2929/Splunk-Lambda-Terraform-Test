@@ -9,7 +9,7 @@ orbs:
 jobs:
   tflint:
     docker:
-      - image: cimg/base:current
+      - image: alpine:latest
         entrypoint: /bin/sh
     resource_class: small
     parameters:
@@ -31,7 +31,7 @@ jobs:
       - run: cd <<parameters.region>> && ../tflint
   terraform_plan:
     docker:
-      - image: cimg/base:current
+      - image: alpine:latest
     resource_class: small
     parameters:
       region:

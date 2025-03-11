@@ -11,12 +11,12 @@ terraform {
   backend "s3" {
     bucket = "splunk-log-forwarder-bucket"
     key    = "splunk-forwarder-global.tfstate"
-    region = "us-east-1"
+    region = "eu-central-1"
   }
 }
 
 provider "aws" {
-  region = "us-east-1"  # Region doesn't matter for IAM resources as they're global
+  region = "eu-central-1" 
 }
 
 # Global IAM role for the Splunk Lambda function

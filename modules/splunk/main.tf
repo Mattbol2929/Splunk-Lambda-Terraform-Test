@@ -66,12 +66,3 @@ resource "aws_cloudwatch_log_subscription_filter" "splunk_subscription_filter" {
   destination_arn = aws_lambda_function.splunk_lambda_cloudwatchlogs_processor.arn
 }
 
-#resource "aws_secretsmanager_secret" "splunk_hec_token" {
-#  name        = "${var.name_prefix}_splunk_hec_token"
-#  description = "HEC token used for authorization with Splunk server"
-#}
-
-#resource "aws_secretsmanager_secret" "splunk_collector_url" {
-#  name        = "${var.name_prefix}_splunk_collector_url"
-#  description = "URL for Splunk HTTP Collector"
-#}

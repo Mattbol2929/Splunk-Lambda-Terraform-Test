@@ -12,7 +12,7 @@ terraform {
   backend "s3" {
     bucket = "splunk-log-forwarder-bucket"
     key    = "splunk-forwarder-us-east-1.tfstate"
-    region = "us-east-1"
+    region = "eu-central-1"
   }
 }
 

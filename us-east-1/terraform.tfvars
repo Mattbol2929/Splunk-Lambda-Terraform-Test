@@ -1,9 +1,6 @@
 # Path to the Lambda function zip file
 lambda_zip_path = "../src/SplunkLambdaCloudWatchLogsProcessor.zip"
 
-# The CloudWatch log group to subscribe to the Splunk Lambda function
-#target_log_group = "/aws/lambda/my-first-tf-lambda-function"
-
 # Splunk HEC host URL
 hec_host = "$SPLUNK_COLLECTOR_URL"
 

@@ -59,6 +59,28 @@ jobs:
         type: string
     steps:
       - checkout
+      - run: 
+          name: Set Terraform environment variables from Splunk context
+          command: |
+            # Export Splunk environment variables as TF_VAR_* variables
+            # Terraform automatically uses environment variables with TF_VAR_ prefix
+            export TF_VAR_hec_host="$SPLUNK_COLLECTOR_URL"
+            export TF_VAR_hec_token="$SPLUNK_HEC_TOKEN"
+            
+            # Create a new terraform.tfvars file with the correct values
+            cat > <<parameters.region>>/terraform.tfvars << EOF
+            # Path to the Lambda function zip file
+            lambda_zip_path = "../src/SplunkLambdaCloudWatchLogsProcessor.zip"
+
+            # Splunk HEC host URL
+            hec_host = "$SPLUNK_COLLECTOR_URL"
+
+            # Splunk HEC token
+            hec_token = "$SPLUNK_HEC_TOKEN"
+
+            # ELB cookie name (if applicable)
+            elb_cookie_name = ""
+            EOF
       - run: terraform -chdir=<<parameters.region>> init 
       - run: terraform -chdir=<<parameters.region>> plan -var-file=terraform.tfvars -out=tf-<<parameters.region>>.plan
 
@@ -81,6 +103,28 @@ jobs:
         type: string
     steps:
       - checkout
+      - run: 
+          name: Set Terraform environment variables from Splunk context
+          command: |
+            # Export Splunk environment variables as TF_VAR_* variables
+            # Terraform automatically uses environment variables with TF_VAR_ prefix
+            export TF_VAR_hec_host="$SPLUNK_COLLECTOR_URL"
+            export TF_VAR_hec_token="$SPLUNK_HEC_TOKEN"
+            
+            # Create a new terraform.tfvars file with the correct values
+            cat > <<parameters.region>>/terraform.tfvars << EOF
+            # Path to the Lambda function zip file
+            lambda_zip_path = "../src/SplunkLambdaCloudWatchLogsProcessor.zip"
+
+            # Splunk HEC host URL
+            hec_host = "$SPLUNK_COLLECTOR_URL"
+
+            # Splunk HEC token
+            hec_token = "$SPLUNK_HEC_TOKEN"
+
+            # ELB cookie name (if applicable)
+            elb_cookie_name = ""
+            EOF
       - run: terraform -chdir=<<parameters.region>> init 
       - run: terraform -chdir=<<parameters.region>> plan -var-file=terraform.tfvars -out=tf-<<parameters.region>>.plan
       - run: terraform -chdir=<<parameters.region>> apply tf-<<parameters.region>>.plan
@@ -115,7 +159,9 @@ workflows:
           matrix:
             parameters:
               region: ["us-east-1", "us-east-2"]    
-          context: aws
+          context: 
+            - aws
+            - splunk
 
       - terraform_plan_global:
           name: terraform-plan-global
@@ -152,6 +198,3 @@ workflows:
           context: 
             - aws
             - splunk
-        
-
-      

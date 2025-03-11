@@ -13,7 +13,7 @@ variable "hec_host" {
 variable "hec_token" {
   description = "Authorization token"
   type        = string
-  default     = "${SPLUNK_HEC_TOKEN}"
+  default     = "$SPLUNK_HEC_TOKEN"
 }
 
 variable "elb_cookie_name" {

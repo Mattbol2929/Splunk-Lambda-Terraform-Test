@@ -18,8 +18,8 @@ jobs:
     steps:
       - setup_remote_docker
       - checkout
-      - run: docker run --rm -v $(pwd):/data -t ghcr.io/terraform-linters/tflint
-      - run: cd <<parameters.region>> && ../.tflint
+      - run:  docker run --rm -v $(pwd):/data -t --entrypoint /bin/sh ghcr.io/terraform-linters/tflint -c "tflint --init && cd <<parameters.region>> && tflint"
+      #- run: cd <<parameters.region>> && ../.tflint
   terraform_plan:
     docker:
       - image: cimg/base:current

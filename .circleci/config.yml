@@ -83,7 +83,7 @@ jobs:
       - checkout
       - run: terraform -chdir=<<parameters.region>> init 
       - run: terraform -chdir=<<parameters.region>> plan -var-file=terraform.tfvars -out=tf-<<parameters.region>>.plan
-      - run: terraform -chdir=<<parameters.region>> apply tf-<<parameters.region>>.plan -var-file=terraform.tfvars
+      - run: terraform -chdir=<<parameters.region>> apply tf-<<parameters.region>>.plan
 
   terraform_apply_global:
     docker:

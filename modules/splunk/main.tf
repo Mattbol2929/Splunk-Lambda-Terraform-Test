@@ -1,7 +1,7 @@
 resource "aws_lambda_function" "splunk_lambda_cloudwatchlogs_processor" {
   function_name = "${var.name_prefix}_splunk_lambda_cloudwatchlogs_processor"
   role          = var.lambda_role_arn
-  handler       = "index.splunk_lambda_cloudwatchlogs_processor"
+  handler       = "index.${var.name_prefix}splunk_lambda_cloudwatchlogs_processor"
   runtime       = "python3.9"
   filename      = var.lambda_zip_path
 

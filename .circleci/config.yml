@@ -9,7 +9,7 @@ orbs:
 jobs:
   tflint:
     docker:
-      - image: alpine:latest
+      - image: hashicorp/terraform:1.7
         entrypoint: /bin/sh
     resource_class: small
     parameters:
@@ -31,7 +31,7 @@ jobs:
       - run: cd <<parameters.region>> && ../tflint --minimum-failure-severity=error
   terraform_plan:
     docker:
-      - image: alpine:latest
+      - image: hashicorp/terraform:1.7
     resource_class: small
     parameters:
       region:

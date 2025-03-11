@@ -178,7 +178,7 @@ workflows:
               only:
                 - main            
       - terraform_apply_backend:
-          name: terraform_plan_backend
+          name: terraform_apply_backend
           requires:
             - backend-approval
           filters:

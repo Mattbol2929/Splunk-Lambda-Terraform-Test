@@ -195,7 +195,7 @@ workflows:
       - terraform_plan_region:
           name: terraform-plan-<<matrix.region>>
           requires:
-            - tflint-<<matrix.region>>
+            - tflint-<<parameters.region>>
             - terraform-apply-global
           matrix:
             parameters:

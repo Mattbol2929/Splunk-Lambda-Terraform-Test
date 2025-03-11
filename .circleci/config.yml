@@ -34,10 +34,6 @@ jobs:
       - image: hashicorp/terraform:1.7
         entrypoint: /bin/sh
     resource_class: small
-    parameters:
-      region:
-        description: "AWS region to deploy to"
-        type: string
     steps:
       - setup_remote_docker
       - checkout
@@ -67,10 +63,6 @@ jobs:
     docker:
       - image: hashicorp/terraform:1.7
     resource_class: small
-    parameters:
-      region:
-        description: "AWS region to deploy to"
-        type: string
     steps:
       - checkout
       - run: terraform -chdir=global init 

@@ -168,7 +168,7 @@ workflows:
           name: terraform-plan-backend
           requires: 
             - tflint-backend
-      - context:
+          context:
             - aws
       - approval:
           name: backend-approval

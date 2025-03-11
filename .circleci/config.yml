@@ -10,6 +10,7 @@ jobs:
   tflint:
     docker:
       - image: cimg/base:current
+        entrypoint: /bin/sh
     resource_class: small
     parameters:
       region:

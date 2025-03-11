@@ -44,6 +44,17 @@ locals {
   ]
 }
 
+# Create a Lambda permission for each log group
+resource "aws_lambda_permission" "splunk_lambda_cloudwatchlogs_processor" {
+  for_each = toset(local.filtered_log_groups)
+  
+  statement_id  = "AllowExecutionFromCloudWatchLogs-${replace(each.value, "/", "_")}"
+  action        = "lambda:InvokeFunction"
+  function_name = aws_lambda_function.splunk_lambda_cloudwatchlogs_processor.arn
+  principal     = "logs.amazonaws.com"
+  source_arn    = "arn:aws:logs:${var.region}:${data.aws_caller_identity.current.account_id}:log-group:${each.value}:*"
+}
+
 # Create a subscription filter for each log group (excluding the Splunk forwarder Lambda's log group)
 resource "aws_cloudwatch_log_subscription_filter" "splunk_subscription_filter" {
   for_each = toset(local.filtered_log_groups)
@@ -52,17 +63,7 @@ resource "aws_cloudwatch_log_subscription_filter" "splunk_subscription_filter" {
   depends_on      = [aws_lambda_permission.splunk_lambda_cloudwatchlogs_processor]
   filter_pattern  = ""
   log_group_name  = each.value
-  destination_arn = "arn:aws:lambda:${var.region}:${data.aws_caller_identity.current.account_id}:function:${var.name_prefix}_splunk_lambda_cloudwatchlogs_processor"
-}
-
-# Create a Lambda permission for each log group
-resource "aws_lambda_permission" "splunk_lambda_cloudwatchlogs_processor" {
-  statement_id  = "AllowExecutionFromCloudWatchLogs"
-  action        = "lambda:InvokeFunction"
-  function_name = aws_lambda_function.splunk_lambda_cloudwatchlogs_processor.arn
-  principal     = "logs.amazonaws.com"
-  # Use a wildcard for the source ARN to allow all log groups with the prefix
-  source_arn = "arn:aws:logs:${var.region}:${data.aws_caller_identity.current.account_id}:log-group:/aws/lambda/*:*"
+  destination_arn = aws_lambda_function.splunk_lambda_cloudwatchlogs_processor.arn
 }
 
 #resource "aws_secretsmanager_secret" "splunk_hec_token" {
@@ -74,4 +75,3 @@ resource "aws_lambda_permission" "splunk_lambda_cloudwatchlogs_processor" {
 #  name        = "${var.name_prefix}_splunk_collector_url"
 #  description = "URL for Splunk HTTP Collector"
 #}
-

@@ -7,11 +7,13 @@ variable "lambda_zip_path" {
 variable "hec_host" {
   description = "URL that receives data input"
   type        = string
+  default     = "${SPLUNK_COLLECTOR_URL}"  
 }
 
 variable "hec_token" {
   description = "Authorization token"
   type        = string
+  default     = "${SPLUNK_HEC_TOKEN}"
 }
 
 variable "elb_cookie_name" {

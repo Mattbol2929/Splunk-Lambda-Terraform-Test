@@ -17,13 +17,7 @@ jobs:
         type: string
     steps:
       - checkout
-      - run:
-          name: Install tflint
-          command: |
-            apk --upgrade --no-cache add curl unzip
-            curl -L -o tflint.zip https://github.com/terraform-linters/tflint/releases/download/v0.45.0/tflint_linux_amd64.zip
-            unzip tflint.zip
-            rm -f tflint.zip
+      - run: docker run --rm -v $(pwd):/data -t ghcr.io/terraform-linters/tflint
       - run: cd <<parameters.region>> && tflint
   terraform_plan:
     docker:

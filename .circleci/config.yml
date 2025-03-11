@@ -7,7 +7,7 @@ orbs:
 # Define a job to be invoked later in a workflow.
 # See: https://circleci.com/docs/jobs-steps/#jobs-overview & https://circleci.com/docs/configuration-reference/#jobs
 jobs:
-  tflint:
+  tflint_region:
     docker:
       - image: hashicorp/terraform:1.7
         entrypoint: /bin/sh
@@ -29,6 +29,28 @@ jobs:
               unzip tflint.zip
               rm -f tflint.zip
       - run: cd <<parameters.region>> && ../tflint --minimum-failure-severity=error
+  tflint_global:
+    docker:
+      - image: hashicorp/terraform:1.7
+        entrypoint: /bin/sh
+    resource_class: small
+    parameters:
+      region:
+        description: "AWS region to deploy to"
+        type: string
+    steps:
+      - setup_remote_docker
+      - checkout
+      #- run: pwd && ls -la && ls -la ../ && ls -la ../.. && ls -la ../../..
+      #- run:  docker run --rm -v $(pwd):/data -t --entrypoint /bin/sh ghcr.io/terraform-linters/tflint -c "tflint --init && pwd && ls -la && cd /home/circleci/project/<<parameters.region>>/ && tflint"
+      #- run: cd <<parameters.region>> && ../.tflint
+      - run:
+          command: |
+              apk --upgrade --no-cache add curl unzip
+              curl -L -o tflint.zip https://github.com/terraform-linters/tflint/releases/download/v0.45.0/tflint_linux_amd64.zip
+              unzip tflint.zip
+              rm -f tflint.zip
+      - run: cd global && ../tflint --minimum-failure-severity=error
   terraform_plan_region:
     docker:
       - image: hashicorp/terraform:1.7
@@ -41,15 +63,29 @@ jobs:
       - checkout
       - run: terraform -chdir=<<parameters.region>> init 
       - run: terraform -chdir=<<parameters.region>> plan -var-file=terraform.tfvars
+  terraform_plan_global:
+    docker:
+      - image: hashicorp/terraform:1.7
+    resource_class: small
+    parameters:
+      region:
+        description: "AWS region to deploy to"
+        type: string
+    steps:
+      - checkout
+      - run: terraform -chdir=global init 
+      - run: terraform -chdir=global plan -var-file=terraform.tfvars
 
 workflows:
   tflint_and_plan:
     jobs:
-      - tflint:
+      - tflint_region:
           name: tflint-<<parameters.region>>
           matrix:
             parameters:
-              region: ["global","us-east-1", "us-east-2"]    
+              region: ["us-east-1", "us-east-2"]    
+      - tflint_global:
+          name: tflint-global
       - terraform_plan_region:
           name: terraform-plan-<<parameters.region>>
           requires:
@@ -58,10 +94,8 @@ workflows:
             parameters:
               region: ["us-east-1", "us-east-2"]    
           context: aws
-      - terraform_plan_region:
-          name: terraform-plan-<<parameters.region>>
+      - terraform_plan_global:
+          name: terraform-plan-global
           requires:
-            - tflint-<<parameters.region>>
-          parameters:
-            region: "global"
+            - tflint-global
           context: aws

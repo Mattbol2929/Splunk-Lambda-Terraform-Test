@@ -16,6 +16,7 @@ jobs:
         description: "AWS region to deploy to"
         type: string
     steps:
+      - setup_remote_docker
       - checkout
       - run: docker run --rm -v $(pwd):/data -t ghcr.io/terraform-linters/tflint
       - run: cd <<parameters.region>> && tflint

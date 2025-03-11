@@ -19,8 +19,15 @@ jobs:
       - setup_remote_docker
       - checkout
       #- run: pwd && ls -la && ls -la ../ && ls -la ../.. && ls -la ../../..
-      - run:  docker run --rm -v $(pwd):/data -t --entrypoint /bin/sh ghcr.io/terraform-linters/tflint -c "tflint --init && pwd && ls -la && cd /home/circleci/project/<<parameters.region>>/ && tflint"
+      #- run:  docker run --rm -v $(pwd):/data -t --entrypoint /bin/sh ghcr.io/terraform-linters/tflint -c "tflint --init && pwd && ls -la && cd /home/circleci/project/<<parameters.region>>/ && tflint"
       #- run: cd <<parameters.region>> && ../.tflint
+      - run:
+          command: |
+              apk --upgrade --no-cache add curl unzip
+              curl -L -o tflint.zip https://github.com/terraform-linters/tflint/releases/download/v0.45.0/tflint_linux_amd64.zip
+              unzip tflint.zip
+              rm -f tflint.zip
+      - run: cd <<parameters.region>> && ../tflint
   terraform_plan:
     docker:
       - image: cimg/base:current

@@ -48,7 +48,7 @@ locals {
 resource "aws_lambda_permission" "splunk_lambda_cloudwatchlogs_processor" {
   for_each = toset(local.filtered_log_groups)
   
-  statement_id  = "AllowExecutionFromCloudWatchLogs-${replace(each.value, "/", "_")}"
+  statement_id  = "AllowCWLogs-${substr(sha256(each.value), 0, 8)}"
   action        = "lambda:InvokeFunction"
   function_name = aws_lambda_function.splunk_lambda_cloudwatchlogs_processor.arn
   principal     = "logs.amazonaws.com"

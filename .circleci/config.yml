@@ -142,4 +142,16 @@ workflows:
             - terraform-plan-us-east-1
             - terraform-plan-us-east-2
 
+      - terraform_apply_region:
+          name: terraform-apply-<<matrix.region>>
+          requires:
+            - region-approval
+          matrix:
+            parameters:
+              region: ["us-east-1", "us-east-2"]    
+          context: 
+            - aws
+            - splunk
+        
+
       

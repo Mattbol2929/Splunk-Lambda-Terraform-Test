@@ -74,3 +74,4 @@ resource "aws_lambda_permission" "splunk_lambda_cloudwatchlogs_processor" {
 #  name        = "${var.name_prefix}_splunk_collector_url"
 #  description = "URL for Splunk HTTP Collector"
 #}
+

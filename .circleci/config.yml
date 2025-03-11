@@ -165,20 +165,20 @@ workflows:
       - tflint_backend:
           name: tflint-backend
       - terraform_plan_backend:
-          name: terraform_plan_backend
+          name: terraform-plan-backend
           requires: 
             - tflint-backend
       - approval:
           name: backend-approval
           type: approval
           requires:
-            - terraform_plan_backend
+            - terraform-plan-backend
           filters:
             branches:
               only:
                 - main            
       - terraform_apply_backend:
-          name: terraform_apply_backend
+          name: terrafor-apply-backend
           requires:
             - backend-approval
           filters:

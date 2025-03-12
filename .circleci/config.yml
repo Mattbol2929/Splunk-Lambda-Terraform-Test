@@ -203,18 +203,21 @@ workflows:
               only:
                 - main     
       - approval:
-          name: region-apply-approval
+          name: region-apply-approval-<<matrix.region>>
           type: approval
           requires: 
-            - terraform-apply-global
+            - terraform-plan-<<matrix.region>>
           filters:
             branches:
               only:
                 - main
+          matrix:
+            parameters:
+              region: ["us-east-1", "eu-central-1"]    
       - terraform_apply_region:
           name: terraform-apply-<<matrix.region>>
           requires:
-            - region-apply-approval
+            - region-apply-approval-<<matrix.region>>
           matrix:
             parameters:
               region: ["us-east-1", "eu-central-1"]    

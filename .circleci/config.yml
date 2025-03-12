@@ -238,9 +238,6 @@ workflows:
           requires: 
             - terraform-apply-global
             - terraform-plan-<<matrix.region>>
-          matrix:
-            parameters:
-              region: ["us-east-1", "eu-central-1"]    
           filters:
             branches:
               only:

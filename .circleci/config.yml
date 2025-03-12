@@ -196,3 +196,17 @@ workflows:
             branches:
               only:
                 - main
+      - terraform_destroy_region:
+          name: terraform-destroy-<<matrix.region>>
+          requires:
+            - region-destroy-approval-<<matrix.region>>
+          matrix:
+            parameters:
+              region: ["us-east-1", "eu-central-1"]    
+          context: 
+            - aws
+            - splunk
+          filters:
+            branches:
+                only:
+                - main

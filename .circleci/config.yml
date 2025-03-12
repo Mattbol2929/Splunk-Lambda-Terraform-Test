@@ -153,7 +153,6 @@ workflows:
           name: global-apply-approval
           type: approval
           requires: 
-            - terraform-apply-backend
             - terraform-plan-global
           filters:
             branches:

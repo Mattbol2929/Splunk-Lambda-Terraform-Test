@@ -70,7 +70,28 @@ jobs:
             elb_cookie_name = ""
             EOF
       - run: terraform -chdir=<<parameters.region>> init 
-      - run: terraform -chdir=<<parameters.region>> plan -var-file=terraform.tfvars -out=tf-<<parameters.region>>.plan
+      - run: 
+          name: Plan Terraform changes and check if there are changes
+          command: |
+            terraform -chdir=<<parameters.region>> plan -var-file=terraform.tfvars -out=tf-<<parameters.region>>.plan
+            
+            # Check if there are any changes in the plan
+            CHANGES=$(terraform -chdir=<<parameters.region>> show -no-color tf-<<parameters.region>>.plan | grep -E '^\s*[~+-]' | wc -l)
+            
+            # Create a file to indicate if there are changes
+            if [ $CHANGES -gt 0 ]; then
+              echo "Changes detected in <<parameters.region>> region"
+              mkdir -p /tmp/workspace
+              echo "true" > /tmp/workspace/has_changes_<<parameters.region>>
+            else
+              echo "No changes detected in <<parameters.region>> region"
+              mkdir -p /tmp/workspace
+              echo "false" > /tmp/workspace/has_changes_<<parameters.region>>
+            fi
+      - persist_to_workspace:
+          root: /tmp/workspace
+          paths:
+            - has_changes_<<parameters.region>>
 
   terraform_plan_global:
     docker:
@@ -79,7 +100,28 @@ jobs:
     steps:
       - checkout
       - run: terraform -chdir=global init 
-      - run: terraform -chdir=global plan -out=tf-global.plan
+      - run: 
+          name: Plan Terraform changes and check if there are changes
+          command: |
+            terraform -chdir=global plan -out=tf-global.plan
+            
+            # Check if there are any changes in the plan
+            CHANGES=$(terraform -chdir=global show -no-color tf-global.plan | grep -E '^\s*[~+-]' | wc -l)
+            
+            # Create a file to indicate if there are changes
+            if [ $CHANGES -gt 0 ]; then
+              echo "Changes detected in global configuration"
+              mkdir -p /tmp/workspace
+              echo "true" > /tmp/workspace/has_changes_global
+            else
+              echo "No changes detected in global configuration"
+              mkdir -p /tmp/workspace
+              echo "false" > /tmp/workspace/has_changes_global
+            fi
+      - persist_to_workspace:
+          root: /tmp/workspace
+          paths:
+            - has_changes_global
 
   terraform_apply_region:
     docker:
@@ -91,6 +133,23 @@ jobs:
         type: string
     steps:
       - checkout
+      - attach_workspace:
+          at: /tmp/workspace
+      - run:
+          name: Check if there are changes to apply
+          command: |
+            if [ -f /tmp/workspace/has_changes_<<parameters.region>> ]; then
+              HAS_CHANGES=$(cat /tmp/workspace/has_changes_<<parameters.region>>)
+              if [ "$HAS_CHANGES" = "false" ]; then
+                echo "No changes detected in <<parameters.region>> region. Skipping apply."
+                circleci-agent step halt
+                exit 0
+              else
+                echo "Changes detected in <<parameters.region>> region. Proceeding with apply."
+              fi
+            else
+              echo "Change detection file not found. Proceeding with apply as a precaution."
+            fi
       - run: 
           name: Set Terraform environment variables from Splunk context
           command: |
@@ -120,6 +179,23 @@ jobs:
     resource_class: small
     steps:
       - checkout
+      - attach_workspace:
+          at: /tmp/workspace
+      - run:
+          name: Check if there are changes to apply
+          command: |
+            if [ -f /tmp/workspace/has_changes_global ]; then
+              HAS_CHANGES=$(cat /tmp/workspace/has_changes_global)
+              if [ "$HAS_CHANGES" = "false" ]; then
+                echo "No changes detected in global configuration. Skipping apply."
+                circleci-agent step halt
+                exit 0
+              else
+                echo "Changes detected in global configuration. Proceeding with apply."
+              fi
+            else
+              echo "Change detection file not found. Proceeding with apply as a precaution."
+            fi
       - run: terraform -chdir=global init
       - run: terraform -chdir=global plan -out=tf-global.plan
       - run: terraform -chdir=global apply tf-global.plan
@@ -168,18 +244,21 @@ workflows:
               only:
                 - main     
       - approval:
-          name: region-apply-approval
+          name: region-apply-approval-<<matrix.region>>
           type: approval
           requires: 
-            - terraform-apply-global
+            - terraform-plan-<<matrix.region>>
           filters:
             branches:
               only:
                 - main
+          matrix:
+            parameters:
+              region: ["us-east-1", "eu-central-1"]    
       - terraform_apply_region:
           name: terraform-apply-<<matrix.region>>
           requires:
-            - region-apply-approval
+            - region-apply-approval-<<matrix.region>>
           matrix:
             parameters:
               region: ["us-east-1", "eu-central-1"]    
@@ -190,5 +269,3 @@ workflows:
             branches:
                 only:
                 - main
-
-

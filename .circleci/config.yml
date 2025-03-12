@@ -179,52 +179,9 @@ workflows:
             - splunk
       - tflint_global:
           name: tflint-global
-      - approval:
-          name: region-destroy-approval-<<matrix.region>>
-          type: approval
-          requires: 
-            - terraform-plan-<<matrix.region>>
-          matrix:
-            parameters:
-              region: ["us-east-1", "eu-central-1"]    
-          filters:
-            branches:
-              only:
-                - main      
-      - terraform_destroy_region:
-          name: terraform-destroy-<<matrix.region>>
-          requires:
-            - region-destroy-approval-<<matrix.region>>
-          matrix:
-            parameters:
-              region: ["us-east-1", "eu-central-1"]    
-          context: 
-            - aws
-            - splunk
-          filters:
-            branches:
-                only:
-                - main
       - terraform_plan_global:
           name: terraform-plan-global
           requires:
             - tflint-global
           context: aws      
-      - approval:
-          name: global-destroy-approval
-          type: approval
-          requires: 
-            - terraform-destroy-<<matrix.region>>
-          filters:
-            branches:
-              only:
-                - main
-      - terraform_destroy_global:
-          name: terraform-destroy-global
-          requires:
-            - global-destroy-approval
-          context: aws
-          filters:
-            branches:
-              only:
-                - main     
+

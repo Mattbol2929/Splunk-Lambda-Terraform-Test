@@ -150,17 +150,6 @@ workflows:
             - tflint-global
           context: aws      
       - approval:
-          name: backend-apply-approval
-          type: approval
-          requires:
-            - terraform-plan-backend
-          filters:
-            branches:
-              only:
-                - main
-          context:
-            - aws  
-      - approval:
           name: global-apply-approval
           type: approval
           requires: 

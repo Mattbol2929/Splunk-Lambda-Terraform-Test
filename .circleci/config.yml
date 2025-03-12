@@ -159,103 +159,100 @@ jobs:
       - run: terraform -chdir=global plan -out=tf-global.plan
       - run: terraform -chdir=global apply tf-global.plan
 
-workflows:
-  tflint_and_plan:
-    jobs:
-      - tflint_backend:
-          name: tflint-backend
-      - terraform_plan_backend:
-          name: terraform-plan-backend
-          requires: 
-            - tflint-backend
-          context:
-            - aws
-      - tflint_region:
-          name: tflint-<<matrix.region>>
-          matrix:
-            parameters:
-              region: ["us-east-1", "eu-central-1"]    
-      - terraform_plan_region:
-          name: terraform-plan-<<matrix.region>>
-          requires:
-            - tflint-<<matrix.region>>
-          matrix:
-            parameters:
-              region: ["us-east-1", "eu-central-1"]    
-          context: 
-            - aws
-            - splunk
-      - tflint_global:
-          name: tflint-global
-      - terraform_plan_global:
-          name: terraform-plan-global
-          requires:
-            - tflint-global
-          context: aws      
-  apply:
-    jobs:
-      - approval:
-          name: backend-apply-approval
-          type: approval
-          requires:
-            - terraform-plan-backend
-          filters:
+workflows::
+  jobs:
+    - tflint_backend:
+        name: tflint-backend
+    - terraform_plan_backend:
+        name: terraform-plan-backend
+        requires: 
+          - tflint-backend
+        context:
+          - aws
+    - tflint_region:
+        name: tflint-<<matrix.region>>
+        matrix:
+          parameters:
+            region: ["us-east-1", "eu-central-1"]    
+    - terraform_plan_region:
+        name: terraform-plan-<<matrix.region>>
+        requires:
+          - tflint-<<matrix.region>>
+        matrix:
+          parameters:
+            region: ["us-east-1", "eu-central-1"]    
+        context: 
+          - aws
+          - splunk
+    - tflint_global:
+        name: tflint-global
+    - terraform_plan_global:
+        name: terraform-plan-global
+        requires:
+          - tflint-global
+        context: aws      
+    - approval:
+        name: backend-apply-approval
+        type: approval
+        requires:
+          - terraform-plan-backend
+        filters:
+          branches:
+            only:
+              - main
+        context:
+          - aws  
+    - terraform_apply_backend:
+        name: terraform-apply-backend
+        requires:
+          - backend-approval
+        filters:
             branches:
               only:
                 - main
-          context:
-            - aws  
-      - terraform_apply_backend:
-          name: terraform-apply-backend
-          requires:
-            - backend-approval
-          filters:
-              branches:
-                only:
-                  - main
-          context:
-            - aws
-      - approval:
-          name: global-approval
-          type: approval
-          requires: 
-            - terraform-apply-backend
-          filters:
-            branches:
+        context:
+          - aws
+    - approval:
+        name: global-approval
+        type: approval
+        requires: 
+          - terraform-apply-backend
+        filters:
+          branches:
+            only:
+              - main
+    - terraform_apply_global:
+        name: terraform-apply-global
+        requires:
+          - global-approval
+        context: aws
+        filters:
+          branches:
+            only:
+              - main     
+    - approval:
+        name: region-approval
+        type: approval
+        requires: 
+          - terraform-apply-global
+        filters:
+          branches:
+            only:
+              - main
+    - terraform_apply_region:
+        name: terraform-apply-<<matrix.region>>
+        requires:
+          - region-approval
+        matrix:
+          parameters:
+            region: ["us-east-1", "eu-central-1"]    
+        context: 
+          - aws
+          - splunk
+        filters:
+          branches:
               only:
-                - main
-      - terraform_apply_global:
-          name: terraform-apply-global
-          requires:
-            - global-approval
-          context: aws
-          filters:
-            branches:
-              only:
-                - main     
-      - approval:
-          name: region-approval
-          type: approval
-          requires: 
-            - terraform-apply-global
-          filters:
-            branches:
-              only:
-                - main
-      - terraform_apply_region:
-          name: terraform-apply-<<matrix.region>>
-          requires:
-            - region-approval
-          matrix:
-            parameters:
-              region: ["us-east-1", "eu-central-1"]    
-          context: 
-            - aws
-            - splunk
-          filters:
-            branches:
-              only:
-                - main
+              - main
 
 
           

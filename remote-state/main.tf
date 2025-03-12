@@ -13,8 +13,8 @@ provider "aws" {
     region = "eu-central-1"
 }
 
-resource "aws_s3_bucket" "splunk-log-forwarder-bucket-test" {
-    bucket = "splunk-log-forwarder-bucket-test"
+resource "aws_s3_bucket" "splunk-log-forwarder-bucket" {
+    bucket = "splunk-log-forwarder-bucket"
 
     lifecycle {
         prevent_destroy = true
@@ -22,7 +22,7 @@ resource "aws_s3_bucket" "splunk-log-forwarder-bucket-test" {
 }
 
 resource "aws_s3_bucket_versioning" "splunk-log-forwarder" {
-    bucket = aws_s3_bucket.splunk-log-forwarder-bucket-test.bucket
+    bucket = aws_s3_bucket.splunk-log-forwarder-bucket.bucket
     versioning_configuration{
         status = "Enabled"
         }

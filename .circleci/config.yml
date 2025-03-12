@@ -206,7 +206,7 @@ workflows:
       - terraform_apply_backend:
           name: terraform-apply-backend
           requires:
-            - backend-approval
+            - backend-apply-approval
           filters:
               branches:
                 only:
@@ -214,7 +214,7 @@ workflows:
           context:
             - aws
       - approval:
-          name: global-approval
+          name: global-apply-approval
           type: approval
           requires: 
             - terraform-apply-backend
@@ -225,14 +225,14 @@ workflows:
       - terraform_apply_global:
           name: terraform-apply-global
           requires:
-            - global-approval
+            - global-apply-approval
           context: aws
           filters:
             branches:
               only:
                 - main     
       - approval:
-          name: region-approval
+          name: region-apply-approval
           type: approval
           requires: 
             - terraform-apply-global
@@ -243,7 +243,7 @@ workflows:
       - terraform_apply_region:
           name: terraform-apply-<<matrix.region>>
           requires:
-            - region-approval
+            - region-apply-approval
           matrix:
             parameters:
               region: ["us-east-1", "eu-central-1"]    

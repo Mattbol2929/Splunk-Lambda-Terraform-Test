@@ -153,10 +153,6 @@ jobs:
     docker:
       - image: hashicorp/terraform:1.7
     resource_class: small
-    parameters:
-      region:
-        description: "AWS region to deploy to"
-        type: string
     steps:
       - checkout
       - run: terraform -chdir=global init
@@ -218,6 +214,9 @@ workflows:
           name: terraform-destroy-global
           requires:
             - terraform-destroy-<<matrix.region>>
+          matrix:
+            parameters:
+              region: ["us-east-1", "eu-central-1"]          
           context: aws
           filters:
             branches:

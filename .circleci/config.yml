@@ -31,7 +31,7 @@ jobs:
   terraform_apply_backend:
       docker:
         - image: hashicorp/terraform:1.7
-      resource_class: small
+      resource_class: large
       steps:
         - checkout
         - run: terraform -chdir=remote-state init

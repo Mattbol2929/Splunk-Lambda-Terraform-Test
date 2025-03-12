@@ -182,7 +182,7 @@ workflows:
           context:
             - aws            
       - terraform_apply_backend:
-          name: terrafor-apply-backend
+          name: terraform-apply-backend
           requires:
             - backend-approval
           filters:
@@ -202,6 +202,7 @@ workflows:
           name: terraform-plan-<<matrix.region>>
           requires:
             - tflint-<<matrix.region>>
+            - terraform-apply-backend
           matrix:
             parameters:
               region: ["us-east-1", "eu-central-1"]    
@@ -212,6 +213,7 @@ workflows:
           name: terraform-plan-global
           requires:
             - tflint-global
+            - terraform-apply-backend
           context: aws      
       - approval:
           name: global-approval
@@ -235,8 +237,7 @@ workflows:
           name: region-approval
           type: approval
           requires: 
-            - terraform-plan-us-east-1
-            - terraform-plan-eu-central-1
+            - terraform-plan-<<parameters.region>>
           filters:
             branches:
               only:

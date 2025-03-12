@@ -37,7 +37,7 @@ data "terraform_remote_state" "global" {
   config = {
     bucket = "splunk-log-forwarder-bucket-2"
     key    = "splunk-forwarder-global.tfstate"
-    region = "us-central-1"
+    region = "eu-central-1"
   }
 }
 

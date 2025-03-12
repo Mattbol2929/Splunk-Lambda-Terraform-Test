@@ -9,7 +9,7 @@ terraform {
 
   # You can use a different backend configuration if needed
   backend "s3" {
-    bucket = "splunk-log-forwarder-bucket-test"
+    bucket = "splunk-log-forwarder-bucket"
     key    = "splunk-forwarder-global.tfstate"
     region = "eu-central-1"
   }
@@ -38,7 +38,7 @@ resource "aws_iam_role" "splunk_lambda_role" {
 }
 
 resource "aws_iam_role_policy" "splunk_lambda_policy" {
-  name = "splunk_lambda_policy"
+  name = "splunk_lambda_policy_test"
   role = aws_iam_role.splunk_lambda_role.id
 
   policy = jsonencode({

@@ -36,7 +36,7 @@ jobs:
         - checkout
         - run: terraform -chdir=remote-state init
         - run: terraform -chdir=remote-state plan -out=tf-backend.plan
-        - run: terraform -chdir=remote-state destroy tf-backend.plan
+        - run: terraform -chdir=remote-state destroy
 
   tflint_region:
     docker:
@@ -147,7 +147,7 @@ jobs:
             EOF
       - run: terraform -chdir=<<parameters.region>> init 
       - run: terraform -chdir=<<parameters.region>> plan -var-file=terraform.tfvars -out=tf-<<parameters.region>>.plan
-      - run: terraform -chdir=<<parameters.region>> destroy tf-<<parameters.region>>.plan
+      - run: terraform -chdir=<<parameters.region>> destroy
 
   terraform_destroy_global:
     docker:
@@ -157,7 +157,7 @@ jobs:
       - checkout
       - run: terraform -chdir=global init
       - run: terraform -chdir=global plan -out=tf-global.plan
-      - run: terraform -chdir=global destroy tf-global.plan
+      - run: terraform -chdir=global destroy
 
 workflows:
   terraform_plan_and_destroy:

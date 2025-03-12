@@ -14,7 +14,7 @@ provider "aws" {
 }
 
 resource "aws_s3_bucket" "splunk-log-forwarder-bucket" {
-    bucket = "splunk-log-forwarder-bucket"
+    bucket = "splunk-log-forwarder-bucket-2"
 
     lifecycle {
         prevent_destroy = true

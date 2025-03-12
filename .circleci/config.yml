@@ -210,3 +210,17 @@ workflows:
             branches:
                 only:
                 - main
+      - terraform_destroy_global:
+          name: terraform-destroy-global
+          requires:
+            - terraform_destroy_region
+          context: aws
+          filters:
+            branches:
+              only:
+                - main     
+
+
+
+
+

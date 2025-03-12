@@ -237,7 +237,7 @@ workflows:
           type: approval
           requires: 
             - terraform-apply-global
-            - terraform-plan-region
+            - terraform-plan-<<matrix.region>>
           filters:
             branches:
               only:

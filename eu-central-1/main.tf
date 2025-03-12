@@ -19,7 +19,7 @@ terraform {
 # Define the regions to deploy to
 locals {
   regions = {
-    us_west_2 = {
+    eu_central_1  = {
       region_name = "eu-central-1"
       prefix      = "euc1"
     }

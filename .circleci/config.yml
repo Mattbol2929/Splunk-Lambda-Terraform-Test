@@ -237,7 +237,8 @@ workflows:
           name: region-approval
           type: approval
           requires: 
-            - terraform-plan-<<parameters.region>>
+            - terraform-plan-us-east-1
+            - terraform-plan-eu-central-1
           filters:
             branches:
               only:

@@ -60,7 +60,7 @@ workflows:
                 - main
           context:
             - aws  
-      - terraform_apply_backend:
+      - terraform_destroy_backend:
           name: terraform-destroy-backend
           requires:
             - backend-destroy-approval

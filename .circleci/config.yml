@@ -226,6 +226,9 @@ workflows:
           name: terraform-destroy-global
           requires:
             - global-destroy-approval-<<matrix.region>>
+          matrix:
+            parameters:
+              region: ["us-east-1", "eu-central-1"]              
           context: aws
           filters:
             branches:

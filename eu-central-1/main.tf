@@ -11,8 +11,8 @@ terraform {
   # You can use a different backend configuration if needed
   backend "s3" {
     bucket = "splunk-log-forwarder-bucket"
-    key    = "splunk-forwarder-us-west-2.tfstate"
-    region = "us-east-1"
+    key    = "splunk-forwarder-eu-central-1.tfstate"
+    region = "eu-central-1"
   }
 }
 
@@ -20,15 +20,15 @@ terraform {
 locals {
   regions = {
     us_west_2 = {
-      region_name = "us-west-2"
-      prefix      = "usw2"
+      region_name = "eu-central-1"
+      prefix      = "euc1"
     }
   }
 }
 
 # Provider configuration for each region
 provider "aws" {
-  region = "us-west-2"
+  region = "eu-central-1"
 }
 
 # Get the global IAM role ARN from the global state
@@ -37,16 +37,16 @@ data "terraform_remote_state" "global" {
   config = {
     bucket = "splunk-log-forwarder-bucket"
     key    = "splunk-forwarder-global.tfstate"
-    region = "us-east-1"
+    region = "us-central-1"
   }
 }
 
 # Deploy the Splunk module to us-west-2
-module "splunk_us_west_2" {
+module "splunk_eu_central_1" {
   source = "../modules/splunk"
   
-  region           = local.regions.us_west_2.region_name
-  name_prefix      = local.regions.us_west_2.prefix
+  region           = local.regions.eu_central_1.region_name
+  name_prefix      = local.regions.eu_central_1.prefix
   lambda_role_arn  = data.terraform_remote_state.global.outputs.splunk_lambda_role_arn
   lambda_zip_path  = var.lambda_zip_path
   hec_host         = var.hec_host

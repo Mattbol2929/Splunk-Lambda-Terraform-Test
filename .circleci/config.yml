@@ -215,6 +215,9 @@ workflows:
           type: approval
           requires: 
             - terraform-destroy-<<matrix.region>>
+          matrix:
+            parameters:
+              region: ["us-east-1", "eu-central-1"]    
           filters:
             branches:
               only:

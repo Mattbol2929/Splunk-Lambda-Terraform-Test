@@ -213,7 +213,7 @@ workflows:
       - terraform_destroy_global:
           name: terraform-destroy-global
           requires:
-            - terraform-destroy-<<matrix.region>>  
+            - terraform_destroy_region
           context: aws
           filters:
             branches:

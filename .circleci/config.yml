@@ -170,8 +170,32 @@ workflows:
             - tflint-backend
           context:
             - aws
+      - tflint_region:
+          name: tflint-<<matrix.region>>
+          matrix:
+            parameters:
+              region: ["us-east-1", "eu-central-1"]    
+      - terraform_plan_region:
+          name: terraform-plan-<<matrix.region>>
+          requires:
+            - tflint-<<matrix.region>>
+          matrix:
+            parameters:
+              region: ["us-east-1", "eu-central-1"]    
+          context: 
+            - aws
+            - splunk
+      - tflint_global:
+          name: tflint-global
+      - terraform_plan_global:
+          name: terraform-plan-global
+          requires:
+            - tflint-global
+          context: aws      
+  apply:
+    jobs:
       - approval:
-          name: backend-approval
+          name: backend-apply-approval
           type: approval
           requires:
             - terraform-plan-backend
@@ -180,7 +204,7 @@ workflows:
               only:
                 - main
           context:
-            - aws            
+            - aws  
       - terraform_apply_backend:
           name: terraform-apply-backend
           requires:
@@ -191,35 +215,11 @@ workflows:
                   - main
           context:
             - aws
-      - tflint_region:
-          name: tflint-<<matrix.region>>
-          matrix:
-            parameters:
-              region: ["us-east-1", "eu-central-1"]    
-      - tflint_global:
-          name: tflint-global
-      - terraform_plan_region:
-          name: terraform-plan-<<matrix.region>>
-          requires:
-            - tflint-<<matrix.region>>
-            - terraform-apply-backend
-          matrix:
-            parameters:
-              region: ["us-east-1", "eu-central-1"]    
-          context: 
-            - aws
-            - splunk
-      - terraform_plan_global:
-          name: terraform-plan-global
-          requires:
-            - tflint-global
-            - terraform-apply-backend
-          context: aws      
       - approval:
           name: global-approval
           type: approval
           requires: 
-            - terraform-plan-global
+            - terraform-apply-backend
           filters:
             branches:
               only:
@@ -237,8 +237,7 @@ workflows:
           name: region-approval
           type: approval
           requires: 
-            - terraform-plan-us-east-1
-            - terraform-plan-eu-central-1
+            - terraform-apply-global
           filters:
             branches:
               only:
@@ -257,3 +256,15 @@ workflows:
             branches:
               only:
                 - main
+
+
+          
+
+
+
+
+
+
+
+
+

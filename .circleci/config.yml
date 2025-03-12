@@ -194,7 +194,7 @@ workflows:
       - terraform_destroy_region:
           name: terraform-destroy-<<matrix.region>>
           requires:
-            - rregion-destroy-approval-<<matrix.region>>
+            - region-destroy-approval-<<matrix.region>>
           matrix:
             parameters:
               region: ["us-east-1", "eu-central-1"]    

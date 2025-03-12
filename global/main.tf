@@ -9,7 +9,7 @@ terraform {
 
   # You can use a different backend configuration if needed
   backend "s3" {
-    bucket = "splunk-log-forwarder-bucket-2"
+    bucket = "splunk-log-forwarder-bucket-3"
     key    = "splunk-forwarder-global.tfstate"
     region = "eu-central-1"
   }

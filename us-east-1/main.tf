@@ -10,7 +10,7 @@ terraform {
 
   # You can use a different backend configuration if needed
   backend "s3" {
-    bucket = "ssplunk-log-forwarder-bucket-2"
+    bucket = "splunk-log-forwarder-bucket-3"
     key    = "splunk-forwarder-us-east-1.tfstate"
     region = "eu-central-1"
   }
@@ -35,7 +35,7 @@ provider "aws" {
 data "terraform_remote_state" "global" {
   backend = "s3"
   config = {
-    bucket = "splunk-log-forwarder-bucket-2"
+    bucket = "splunk-log-forwarder-bucket-3"
     key    = "splunk-forwarder-global.tfstate"
     region = "eu-central-1"
   }

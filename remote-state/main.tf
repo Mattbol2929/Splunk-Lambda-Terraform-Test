@@ -13,7 +13,7 @@ provider "aws" {
     region = "eu-central-1"
 }
 
-resource "aws_s3_bucket" "splunk-log-forwarder-bucket" {
+resource "aws_s3_bucket" "splunk-log-forwarder-bucket-test" {
     bucket = "splunk-log-forwarder-bucket"
 
     lifecycle {
@@ -22,7 +22,7 @@ resource "aws_s3_bucket" "splunk-log-forwarder-bucket" {
 }
 
 resource "aws_s3_bucket_versioning" "splunk-log-forwarder" {
-    bucket = aws_s3_bucket.splunk-log-forwarder-bucket.bucket
+    bucket = aws_s3_bucket.splunk-log-forwarder-bucket-test.bucket
     versioning_configuration{
         status = "Enabled"
         }

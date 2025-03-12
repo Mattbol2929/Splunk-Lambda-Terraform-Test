@@ -182,7 +182,7 @@ workflows:
           context:
             - aws            
       - terraform_apply_backend:
-          name: terrafor-apply-backend
+          name: terraform-apply-backend
           requires:
             - backend-approval
           filters:

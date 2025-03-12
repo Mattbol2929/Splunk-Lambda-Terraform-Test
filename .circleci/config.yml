@@ -214,19 +214,10 @@ workflows:
             branches:
                 only:
                 - main
-      - approval:
-          name: global-destroy-approval
-          type: approval
-          requires: 
-            - terraform-destroy-<<matrix.region>>
-          filters:
-            branches:
-              only:
-                - main
       - terraform_destroy_global:
           name: terraform-destroy-global
           requires:
-            - global-destroy-approval
+            - terraform-destroy-<<matrix.region>>
           context: aws
           filters:
             branches:

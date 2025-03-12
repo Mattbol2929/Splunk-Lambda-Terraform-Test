@@ -180,10 +180,13 @@ workflows:
       - tflint_global:
           name: tflint-global
       - approval:
-          name: region-destroy-approval
+          name: region-destroy-approval-<<matrix.region>>
           type: approval
           requires: 
-            - tflint-<<matrix.region>>
+            - terraform-plan-<<matrix.region>>
+          matrix:
+            parameters:
+              region: ["us-east-1", "eu-central-1"]    
           filters:
             branches:
               only:
@@ -191,7 +194,7 @@ workflows:
       - terraform_destroy_region:
           name: terraform-destroy-<<matrix.region>>
           requires:
-            - region-destroy-approval
+            - rregion-destroy-approval-<<matrix.region>>
           matrix:
             parameters:
               region: ["us-east-1", "eu-central-1"]    

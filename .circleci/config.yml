@@ -3,22 +3,6 @@ version: 2.1
 orbs:
   terraform: circleci/terraform@3.6.0
 jobs:
-  tflint_backend:
-    docker:
-      - image: hashicorp/terraform:1.7
-        entrypoint: /bin/sh
-    resource_class: small 
-    steps:
-      - setup_remote_docker
-      - checkout
-      - run:
-          command: |
-              apk --upgrade --no-cache add curl unzip
-              curl -L -o tflint.zip https://github.com/terraform-linters/tflint/releases/download/v0.45.0/tflint_linux_amd64.zip
-              unzip tflint.zip
-              rm -f tflint.zip
-      - run: cd remote-state && ../tflint --minimum-failure-severity=error
-
   tflint_region:
     docker:
       - image: hashicorp/terraform:1.7
@@ -219,35 +203,6 @@ jobs:
 workflows:
   terraform_plan_and_apply:
     jobs:
-      - tflint_backend:
-          name: tflint-backend
-      - terraform_plan_backend:
-          name: terraform-plan-backend
-          requires: 
-            - tflint-backend
-          context:
-            - aws
-      - approval:
-          name: backend-apply-approval
-          type: approval
-          requires:
-            - terraform-plan-backend
-          filters:
-            branches:
-              only:
-                - main
-          context:
-            - aws  
-      - terraform_apply_backend:
-          name: terraform-apply-backend
-          requires:
-            - backend-apply-approval
-          filters:
-              branches:
-                only:
-                  - main
-          context:
-            - aws
       - tflint_region:
           name: tflint-<<matrix.region>>
           matrix:

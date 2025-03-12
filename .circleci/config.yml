@@ -3,41 +3,6 @@ version: 2.1
 orbs:
   terraform: circleci/terraform@3.6.0
 jobs:
-  tflint_backend:
-    docker:
-      - image: hashicorp/terraform:1.7
-        entrypoint: /bin/sh
-    resource_class: small 
-    steps:
-      - setup_remote_docker
-      - checkout
-      - run:
-          command: |
-              apk --upgrade --no-cache add curl unzip
-              curl -L -o tflint.zip https://github.com/terraform-linters/tflint/releases/download/v0.45.0/tflint_linux_amd64.zip
-              unzip tflint.zip
-              rm -f tflint.zip
-      - run: cd remote-state && ../tflint --minimum-failure-severity=error
-
-  terraform_plan_backend:
-    docker:
-      - image: hashicorp/terraform:1.7
-    resource_class: small
-    steps:
-      - checkout
-      - run: terraform -chdir=remote-state init
-      - run: terraform -chdir=remote-state plan -out=tf-backend.plan
-
-  terraform_destroy_backend:
-      docker:
-        - image: hashicorp/terraform:1.7
-      resource_class: large
-      steps:
-        - checkout
-        - run: terraform -chdir=remote-state init
-        - run: terraform -chdir=remote-state plan -out=tf-backend.plan
-        - run: terraform -chdir=remote-state destroy -auto-approve
-
   tflint_region:
     docker:
       - image: hashicorp/terraform:1.7
@@ -116,7 +81,7 @@ jobs:
       - run: terraform -chdir=global init 
       - run: terraform -chdir=global plan -out=tf-global.plan
 
-  terraform_destroy_region:
+  terraform_apply_region:
     docker:
       - image: hashicorp/terraform:1.7
     resource_class: small
@@ -147,9 +112,9 @@ jobs:
             EOF
       - run: terraform -chdir=<<parameters.region>> init 
       - run: terraform -chdir=<<parameters.region>> plan -var-file=terraform.tfvars -out=tf-<<parameters.region>>.plan
-      - run: terraform -chdir=<<parameters.region>> destroy -auto-approve
+      - run: terraform -chdir=<<parameters.region>> apply tf-<<parameters.region>>.plan
 
-  terraform_destroy_global:
+  terraform_apply_global:
     docker:
       - image: hashicorp/terraform:1.7
     resource_class: small
@@ -157,10 +122,10 @@ jobs:
       - checkout
       - run: terraform -chdir=global init
       - run: terraform -chdir=global plan -out=tf-global.plan
-      - run: terraform -chdir=global destroy -auto-approve
+      - run: terraform -chdir=global apply tf-global.plan
 
 workflows:
-  terraform_plan_and_destroy:
+  terraform_plan_and_apply:
     jobs:
       - tflint_region:
           name: tflint-<<matrix.region>>
@@ -185,36 +150,48 @@ workflows:
             - tflint-global
           context: aws      
       - approval:
-          name: global-destroy-approval
+          name: backend-apply-approval
+          type: approval
+          requires:
+            - terraform-plan-backend
+          filters:
+            branches:
+              only:
+                - main
+          context:
+            - aws  
+      - approval:
+          name: global-apply-approval
           type: approval
           requires: 
+            - terraform-apply-backend
             - terraform-plan-global
           filters:
             branches:
               only:
                 - main
-      - terraform_destroy_global:
-          name: terraform-destroy-global
+      - terraform_apply_global:
+          name: terraform-apply-global
           requires:
-            - global-destroy-approval
+            - global-apply-approval
           context: aws
           filters:
             branches:
               only:
                 - main     
       - approval:
-          name: region-destroy-approval
+          name: region-apply-approval
           type: approval
           requires: 
-            - terraform-destroy-global
+            - terraform-apply-global
           filters:
             branches:
               only:
                 - main
-      - terraform_destroy_region:
-          name: terraform-destroy-<<matrix.region>>
+      - terraform_apply_region:
+          name: terraform-apply-<<matrix.region>>
           requires:
-            - region-destroy-approval
+            - region-apply-approval
           matrix:
             parameters:
               region: ["us-east-1", "eu-central-1"]    
@@ -225,3 +202,5 @@ workflows:
             branches:
                 only:
                 - main
+
+

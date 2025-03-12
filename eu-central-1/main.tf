@@ -10,7 +10,7 @@ terraform {
 
   # You can use a different backend configuration if needed
   backend "s3" {
-    bucket = "splunk-log-forwarder-bucket"
+    bucket = "splunk-log-forwarder-bucket-test"
     key    = "splunk-forwarder-eu-central-1.tfstate"
     region = "eu-central-1"
   }
